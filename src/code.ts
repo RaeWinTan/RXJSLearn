@@ -29,7 +29,7 @@ const keyed$ = merge(keyUp$, keyDown$).pipe(
 );
 //String.fromCharCode(97+random(26))
 const generator$ = (s:number)  => interval(s).pipe(
-  map((x:number)=>({"val":"v", "xCoor":random(height*4)})),
+  map((x:number)=>({"val":String.fromCharCode(97+random(26)), "xCoor":random(height*4)})),
   tap((x:Letter)=> console.log(x.xCoor)),
   scan<Letter,Letter[]>((acc:Letter[], curr:Letter)=>{
     acc = [curr,...acc];
