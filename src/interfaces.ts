@@ -1,15 +1,14 @@
-export interface Tube {
-  id:number;
-  xCoor:number;
-  gap: number;
-  clear:boolean;
+export interface Letter {
+    val:string;
+    xCoor:number;
 }
 
-export interface Bird {
-  yCoor:number;
-}
+
 
 export interface State {
-  lives: number;
   score: number;
+  level:number;
+  invl: number;
+  clear:boolean;
+  ltrs:Letter[];
 }

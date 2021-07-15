@@ -1,9 +1,23 @@
-import {Tube, Bird, State} from "./interfaces";
 
-const random = () => Math.round(Math.random() * 300);
+
+import {Letter, State} from "./interfaces";
+
+
+//const random = () => Math.round(Math.random() * 300);
 export const elem = (id:string) => document.getElementById(id);
 
+export function drawLetters(s:State){
+  document.body.innerHTML = "";
+  document.body.innerHTML+=`SCORE: ${s.score} | level: ${s.level}`+"<br/>"
+  for(let i of s.ltrs){
+    document.body.innerHTML +='&nbsp'.repeat(i.xCoor) + i.val+"<br/>";
+  }
+}
+export function done(){
+  document.body.innerHTML = "DIED";
+}
 
+/*
 function css(element:any, style:any) {
     for (const property in style)
         element.style[property] = style[property];
@@ -49,3 +63,4 @@ export function moveBird(y:number):void{
 export function updateStatus(s:State):void{
   elem("status").innerHTML = `LIVES: ${s.lives} | SCORE: ${s.score}`;
 }
+*/
