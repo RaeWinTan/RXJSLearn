@@ -1,9 +1,10 @@
-const enum Direction{
+export const enum Direction{
   vertical="vertical",
   horizontal="horizontal",
   all="all",
   no="no"
 }
+
 
 interface Ship {
   pos: number[];
@@ -11,7 +12,7 @@ interface Ship {
   posibleDirection:Direction; //here should have the posible direction it can go
 }
 
-interface ShipMan {
+export interface ShipMan {
   ships:Ship[];
   allPos:number[];
 }
@@ -22,7 +23,7 @@ interface ShipClassConstructor {
 
 export interface ShipClassInterface{
   shipman:ShipMan;
-  add(curr:number):void;
+  add(curr:number):ShipClassInterface;
 }
 
 
@@ -35,7 +36,7 @@ export class ShipClass implements ShipClassInterface {
     this._gridSize = gridSize;
   }
 
-  add(curr:number):void {
+  add(curr:number):ShipClassInterface {
     if(this._shipman.ships.length === 0){
       let pos:number[] = [];
       pos.push(curr);
@@ -62,8 +63,9 @@ export class ShipClass implements ShipClassInterface {
 
       }
     }
+    return this;
   }
-  private checkValidity(curr:number, len:number, ship?:Ship):Direction {
+  protected checkValidity(curr:number, len:number, ship?:Ship):Direction {
     if (this._shipman.allPos.includes(curr)) return Direction.no;
     if (ship === undefined){
       if(this.verticalCan(curr, len) && this.horizontalCan(curr, len)) return Direction.all;
@@ -89,7 +91,7 @@ export class ShipClass implements ShipClassInterface {
     while(t>0){
       if(this.shipman.allPos.includes(t)) break;
       top++;
-      if(top >= limit) return true;
+      if (top >= limit) return true;
       t = t-this._gridSize;
     }
     let bottom:number = 0;
@@ -102,10 +104,10 @@ export class ShipClass implements ShipClassInterface {
     }
     return top+bottom>=limit;
   }
-  private inHorizontalLine(curr:number,n:number):boolean{
+  protected inHorizontalLine(curr:number,n:number):boolean{
     if(curr%this._gridSize === 0) curr--;
     return Math.floor(curr/this._gridSize)*this._gridSize+1<= n &&  Math.floor(curr/this._gridSize)*this._gridSize+this._gridSize>=n;
-}
+  }
 
   private horizontalCan(curr:number,limit:number):boolean{
     limit--; //exclusive of the current so limit - 1;
