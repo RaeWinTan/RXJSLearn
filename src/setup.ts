@@ -4,6 +4,7 @@ import {ShipClass, ShipClassInterface} from "./shipclass";
 import {ShotClass, ShotClassInterface} from "./shotsClass";
 import {ComputerClass} from "./ComputerClass";
 import { Boards } from "./interfaces";
+import {ComputerShotClass} from "./computerShotClass";
 import {from, Subject, merge,interval, fromEvent, combineLatest, concat, of} from "rxjs";
 import { mapTo,tap,scan,reduce,
   mergeMap, take,
@@ -13,10 +14,15 @@ import { mapTo,tap,scan,reduce,
   map,takeWhile, switchMap
 } from "rxjs/operators";
 import {gridSize} from "./constants";
+const sc:ShipClassInterface = new ShipClass({ships:[], allPos:[]}, gridSize);
+const cc:ShipClassInterface = new ComputerClass({ships:[], allPos:[]}, gridSize);
 
+//actually can put the turn here
 export const ui$ = of({
-  playerBoard:new ShipClass({ships:[], allPos:[]}, gridSize),
-  computerBoard:new ComputerClass({ships:[], allPos:[]}, gridSize)
+  playerBoard:sc,
+  computerBoard:cc,
+  playerShot: new ShotClass(cc),
+  computerShot: new ComputerShotClass(sc)
  }).pipe(
   tap((x:Boards)=> setUpGrid(gridSize))
 );

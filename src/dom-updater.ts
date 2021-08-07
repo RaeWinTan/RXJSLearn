@@ -10,7 +10,12 @@ function css(element:any, style:any) {
         element.style[property] = style[property];
 }
 
-
+export function paintCScore(x:any){
+    elem("computerPoints").innerHTML = JSON.stringify(x);
+}
+export function paintPScore(x:any){
+    elem("playerPoints").innerHTML = JSON.stringify(x);
+}
 function idGen(x:number, y:number, n:number){
   if(y === 0){
     return x+1;
@@ -31,6 +36,7 @@ export function setUpGrid(n:number){
   gc.style.width = `${n*32}px`;
   gc.style.height = `${n*32}px`;
   gc.style.gridTemplateColumns = `repeat(${n}, auto)`;
+
   let cpc = document.getElementById("grid-container-player-id-c");
   cpc.style.width = `${n*32}px`;
   cpc.style.height = `${n*32}px`;
@@ -82,6 +88,12 @@ export function paintAll(x:ShipClassInterface){
 
 export function paintShot(n:number, s:boolean){
   let i = document.getElementById(`${n}pci`);
+  if(s)i.innerHTML = "X";
+  else i.innerHTML = "O";
+}
+
+export function paintCShot(n:number, s:boolean){
+  let i = document.getElementById(`${n}cpci`);
   if(s)i.innerHTML = "X";
   else i.innerHTML = "O";
 }

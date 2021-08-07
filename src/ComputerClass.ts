@@ -34,14 +34,12 @@ export class ComputerClass extends ShipClass {
     if(d === Direction.horizontal) this.mulHori(x, len);
     else this.mulVert(x, len);
   }
-  //withini vertical line
+
 
   private mulVert(x:number, len:number){
-    //alternate up down till it's done
     let xUp:number = x-this._gridSize;
     let xDown:number = x+this._gridSize;
     super.add(x);
-    //liddat minus
     len--;
     let u:boolean = false;
     let d:boolean = false;
@@ -63,7 +61,6 @@ export class ComputerClass extends ShipClass {
   }
 
   private mulHori(x:number, len:number){
-    //alternate up down till it's done
     let xLeft:number = x-1;
     let xRight:number = x+1;
     super.add(x);

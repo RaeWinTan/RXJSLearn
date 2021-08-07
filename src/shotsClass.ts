@@ -1,17 +1,23 @@
 //see must base on the shipClasssInterface
 import {ShipClassInterface} from "./shipclass";
+import { BehaviorSubject } from "rxjs";
 
-const enum HitStatus{
-  hit="X",
-  miss="O"
-}
 //need an interface that stores arrray of [boolean, number]
-interface Shot{
+export interface Shot{
   hit:boolean;
   pos:number;
   shipLen?:number;
 }
+//should cache the damage to the ship
+/*
 
+  or
+  just filter from this._shots.hit === true{
+    && get the pos && get the shipLen
+  }
+}}
+
+*/
 
 interface ShotClassConstructor{
   new (oppShips:ShipClassInterface):ShotClassInterface;
@@ -19,7 +25,8 @@ interface ShotClassConstructor{
 
 export interface ShotClassInterface {
   shots:Shot[];
-  shoot(x:number):void;
+  shoot(x:number, s:BehaviorSubject<any>):boolean;
+  lastShot():number;
 }
 
 export class ShotClass implements ShotClassInterface {
@@ -32,22 +39,35 @@ export class ShotClass implements ShotClassInterface {
     return this._shots;
   }
 
-  private shotBefore(x:number):boolean{
+
+  protected shotBefore(x:number):boolean{
     for(let i of this._shots){
       if(x === i.pos) return true;
     }
     return false;
   }
+  lastShot():number{
+    return this._shots[this._shots.length - 1].pos;
+  }
 
-  shoot(x:number):void{
+  shoot(x:number, s:BehaviorSubject<any>):boolean{
     for(let j of this._oppShips.shipman.ships){
       for(let i of j.pos){
         if(!this.shotBefore(x) && x===i){
+          let tmp:any = {...s.value};
+          tmp[j.length] = tmp[j.length] - 1;
+          s.next(tmp);//to update the score
           this._shots.push({hit:true, pos:i, shipLen:j.length});
-          return;
+          return true;
         }
       }
     }
-    if(!this.shotBefore(x)) this._shots.push({hit:false, pos:x});
+    if(!this.shotBefore(x)){
+      this._shots.push({hit:false, pos:x});
+      return true;
+    } else{
+      return false;
+    }
+
   }
 }
