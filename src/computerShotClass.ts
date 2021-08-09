@@ -15,6 +15,7 @@ interface NextTry {
 export class ComputerShotClass  extends ShotClass {
   _nextTry:NextTry;
   _shipProcessing:number[];
+  _testRanShots:number[];
   constructor(oppShips:ShipClassInterface){
     super(oppShips);
     this._nextTry = {
@@ -26,9 +27,6 @@ export class ComputerShotClass  extends ShotClass {
     };
     this._shipProcessing = [];
   }
-  lastShot():number{
-    return super.lastShot();
-  }
   shoot(x:number, scoreBoard:BehaviorSubject<any>):boolean{
     let s:number = 0;//aka shipLen
 
@@ -39,8 +37,7 @@ export class ComputerShotClass  extends ShotClass {
           this._shipProcessing.shift();//no longer have to process that ship
           i--;
         } else { //process that ship
-          let tmpNb:NextBest[] = this._nextTry[this._shipProcessing[0]];
-          s = tmpNb[tmpNb.length -1].possible[tmpNb[tmpNb.length -1].possible.length-1];
+          s = this._shipProcessing[0];
           break;
         }
       }//after pruning out all the front ships that have aalrady been finished processing
@@ -49,7 +46,7 @@ export class ComputerShotClass  extends ShotClass {
           let nb:NextBest = this._nextTry[s][this._nextTry[s].length - 1]; //last element of the nextTry[s]
           for(let i =0; i< nb.possible.length; i++){
             if (super.shotBefore(nb.possible[i])) {
-              nb.possible.shift();
+              console.log("No need to shoot nextbest posiblity: ",nb.possible.shift());
               i--;//so dont process that posible val
             } else {//never shot before and in the nextBest[best case scenerio]
               super.shoot(nb.possible[i], scoreBoard);
@@ -57,8 +54,8 @@ export class ComputerShotClass  extends ShotClass {
                 if(this._shots[this._shots.length -1].shipLen === s){
                   this.updateNextTryMultiple(s, nb.possible[i]);
                 } else {//missed the nextTry boat but coinsidently hit another boat
-                    this.updateNextTry(this._shots[this._shots.length -1].shipLen,nb.possible.shift());
-
+                  console.log("Coninsidently hiht another boat of len:", this._shots[this._shots.length -1].shipLen);
+                  this.updateNextTry(this._shots[this._shots.length -1].shipLen,nb.possible.shift());
                 }
               } else {
                 nb.possible.shift();
@@ -66,9 +63,8 @@ export class ComputerShotClass  extends ShotClass {
               break;
             }
           }
-
       } else {//there is not more ships in queue to be processed so take randomShotAgain
-        x = randomNum(gridSize*gridSize);
+        x = x = randomNum(gridSize*gridSize);
         while(!super.shoot(x, scoreBoard)) x = randomNum(gridSize*gridSize);
         if (this._shots[this._shots.length -1].hit) {//this is a form of clean up
           this.updateNextTry(this._shots[this._shots.length -1].shipLen ,x);
@@ -76,7 +72,7 @@ export class ComputerShotClass  extends ShotClass {
       }
     } else {
       //random number
-      x = randomNum(gridSize*gridSize);
+      x = x = randomNum(gridSize*gridSize);
       while(!super.shoot(x, scoreBoard)) x = randomNum(gridSize*gridSize);
       if (this._shots[this._shots.length -1].hit) {//this is a form of clean up
           this.updateNextTry(this._shots[this._shots.length -1].shipLen ,x);
@@ -104,28 +100,15 @@ export class ComputerShotClass  extends ShotClass {
       }
       return r;
   }
-  private horiPadding(nb:NextBest[], shipLen:number):number[]{
+  private horiPadding(nb:NextBest[], shipLen:number):number[]{//only push one right or one left or both
     let r: number[] = [];
-    //get main body current head and tail
     let ht: number[] = nb.map((s:NextBest) => s.hitVal).sort((a, b) => a < b ? -1 : a > b? 1 : 0);
-    ht = [ht[0],ht[1]];
-
+    ht = [ht[0],ht[ht.length-1]];
     let bodyLen:number = ht[1]-ht[0];
     let right:number = ht[1]+1;
     let left:number = ht[0]-1;
-    while(this.inHorizontalLine(ht[1], right)){
-      if(this.shotBefore(right)) break;
-      if( right - ht[1] > shipLen - bodyLen) break;
-      r.push(right);
-      right++;
-    }
-    while(this.inHorizontalLine(ht[0], left)){
-      if(this.shotBefore(left)) break;
-      if(ht[0] - left > shipLen - bodyLen) break;
-      r.push(left);
-      left--;
-    }
-
+    if(this.inHorizontalLine(ht[0], left) && !this.shotBefore(left) && !(ht[0] - left > shipLen - bodyLen)) r.push(left);
+    if(this.inHorizontalLine(ht[1], right) && !this.shotBefore(right) && !(right - ht[1] > shipLen - bodyLen)) r.push(right);
     return r;
   }
   private vertGaps(nb:NextBest[]):number[]{
@@ -139,66 +122,45 @@ export class ComputerShotClass  extends ShotClass {
     return ans;
   }
   private vertPadding(nb:NextBest[], shipLen:number):number[]{
+    //recommend one up(-gridSize) or one down(+gridSize) or both
     let ans: number[] = [];
-    //get main body current head and tail
     let ht: number[] = nb.map((s:NextBest) => s.hitVal).sort((a, b) => a < b ? -1 : a > b? 1 : 0);
-    ht = [ht[0],ht[1]];
-
+    ht = [ht[0],ht[ht.length-1]];
     let bodyLen:number = (ht[1]-ht[0])/gridSize;
     let down:number = ht[1]+gridSize;
     let up:number = ht[0]-gridSize;
-    while(down<= gridSize*gridSize){
-      if(this.shotBefore(down)) break;
-      if( down - ht[1] > (shipLen - bodyLen)*gridSize) break;
-      ans.push(down);
-      down= down+ gridSize;
-    }
-    while(up > 0){
-      if(this.shotBefore(up)) break;
-      if(ht[0] - up > (shipLen - bodyLen) * gridSize) break;
-      ans.push(up);
-      up = up - gridSize;
-    }
+      if(up > 0 && !super.shotBefore(up) && !(ht[0] - up > (shipLen - bodyLen) * gridSize)) ans.push(up);
+    if(down <= gridSize*gridSize && !super.shotBefore(down) && !( down - ht[1] >= (shipLen - bodyLen)*gridSize))ans.push(down);
     return ans;
   }
   private updateNextTryMultiple(shipLen:number, x:number){
-    //super.shoot was called before this method, this means that the this._shots was already updated
-    //so just need to update the this._nextTry, default possible to : []
     this._nextTry[shipLen].push({hitVal:x, possible:[]});
     if(this._nextTry[shipLen].length === shipLen) return;
 
     let nb:NextBest = this._nextTry[shipLen][this._nextTry[shipLen].length - 1];
     if(this.inHorizontalLine(this._nextTry[shipLen][0].hitVal, this._nextTry[shipLen][1].hitVal)){
-      //now check for gaps
       let horiGaps:number[] = this.horiGaps(this._nextTry[shipLen]);
       if(horiGaps.length > 0) {
         nb.possible = horiGaps;
         return;
       }
-      //check for padding
       nb.possible = this.horiPadding(this._nextTry[shipLen],shipLen);
-    } else { //if it is not in a horizontalLine means that it is in a verticalLine
-      //checck for gaps
+    } else {
       let vg:number[] = this.vertGaps(this._nextTry[shipLen]);
-      if(vg.length >0){
+      if (vg.length >0){
         nb.possible = vg;
         return;
       }
       nb.possible = this.vertPadding(this._nextTry[shipLen],shipLen);
     }
-
   }
 
 
 
   private updateNextTry(shipLen:number, x:number){
-
-    //super.shoot() called befroe this method
     this.addToShipProcessing(shipLen);
-    if(this._nextTry[shipLen].length >0)this.updateNextTryMultiple(shipLen, x);
-    else{
-      this._nextTry[shipLen].push({hitVal: x, possible:this.allDirection(x)});
-    }
+    if(this._nextTry[shipLen].length > 0) this.updateNextTryMultiple(shipLen, x);
+    else this._nextTry[shipLen].push({hitVal: x, possible:this.allDirection(x)});
   }
 
   private inHorizontalLine(curr:number,n:number):boolean{
@@ -208,15 +170,10 @@ export class ComputerShotClass  extends ShotClass {
 
   private allDirection(x:number):number[]{
     let [l,r,u,d]:number[] = [0,0,0,0];
-    //must also take into account genna hit before ones as well
-    //left
     if(!super.shotBefore(x-1) && this.inHorizontalLine(x, x-1)) l = x-1;
-    //right
     if(!super.shotBefore(x+1) && this.inHorizontalLine(x, x+1)) r = x+1;
-    //up
     if(!super.shotBefore(x-gridSize) && x-gridSize > 0) u = x-gridSize;
-    //down
     if(!super.shotBefore(x+gridSize) && x+gridSize<=gridSize*gridSize) d = x + gridSize;
-    return [l,r,u,d].filter((x:number)=> x > 0);
+    return [u,d,l,r].filter((x:number)=> x > 0);
   }
 }

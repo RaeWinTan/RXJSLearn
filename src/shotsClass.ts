@@ -8,16 +8,7 @@ export interface Shot{
   pos:number;
   shipLen?:number;
 }
-//should cache the damage to the ship
-/*
 
-  or
-  just filter from this._shots.hit === true{
-    && get the pos && get the shipLen
-  }
-}}
-
-*/
 
 interface ShotClassConstructor{
   new (oppShips:ShipClassInterface):ShotClassInterface;
@@ -26,7 +17,7 @@ interface ShotClassConstructor{
 export interface ShotClassInterface {
   shots:Shot[];
   shoot(x:number, s:BehaviorSubject<any>):boolean;
-  lastShot():number;
+
 }
 
 export class ShotClass implements ShotClassInterface {
@@ -45,9 +36,6 @@ export class ShotClass implements ShotClassInterface {
       if(x === i.pos) return true;
     }
     return false;
-  }
-  lastShot():number{
-    return this._shots[this._shots.length - 1].pos;
   }
 
   shoot(x:number, s:BehaviorSubject<any>):boolean{

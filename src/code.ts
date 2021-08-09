@@ -23,5 +23,5 @@ const game$ = ui$.pipe(
   switchMap((initial:Boards)=>concat(setUp$(initial), shots$(initial)))
 );
 
-//must merge game to score
-game$.subscribe(console.log);
+
+game$.subscribe();
