@@ -26,28 +26,16 @@ export const ui$ = of({
  }).pipe(
   tap(_=> setUpGrid(gridSize))
 );
-/*
 const playerSetup$ = (sci:ShipClassInterface) =>
   fromEvent(elem("grid-container-id"), "click").pipe(
     map((e:MouseEvent)=> +(e.target as Element).id),
     scan<number, ShipClassInterface>((acc:ShipClassInterface, curr:number)=> acc.add(curr), sci),
     tap((x:ShipClassInterface)=>{
       paintShip(x.shipman.ships[x.shipman.ships.length-1].pos[x.shipman.ships[x.shipman.ships.length-1].pos.length-1], 5-x.shipman.ships.length+1);
-      console.log(x.shipman.allPos);
     }),
     takeWhile((x:ShipClassInterface)=> x.shipman.ships.length < 5)
   );
-*/
-//Test data for playerSetup$ [17, 27, 37, 47, 57, 65, 55, 45, 35, 66, 67, 68, 36, 26, 46]
 
-const playerSetup$ = (sci:ShipClassInterface) =>
-  from([63, 64, 65, 66, 67, 42, 43, 44, 45, 62, 52, 72, 55, 56, 54]).pipe(
-    scan<number, ShipClassInterface>((acc:ShipClassInterface, curr:number)=> acc.add(curr), sci),
-    tap((x:ShipClassInterface)=>{
-      paintShip(x.shipman.ships[x.shipman.ships.length-1].pos[x.shipman.ships[x.shipman.ships.length-1].pos.length-1], 5-x.shipman.ships.length+1);
-    }),
-    takeWhile((x:ShipClassInterface)=> x.shipman.ships.length < 5)
-  );
 
 const computerSetup$ = (sci:ShipClassInterface) =>
   interval().pipe(
