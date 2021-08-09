@@ -1,17 +1,13 @@
 
-import {setUpGrid, paintShip, elem, paintShot, paintAll} from "./dom-updater";
+import {setUpGrid, paintShip, elem} from "./dom-updater";
 import {ShipClass, ShipClassInterface} from "./shipclass";
-import {ShotClass, ShotClassInterface} from "./shotsClass";
+import {ShotClass} from "./shotsClass";
 import {ComputerClass} from "./ComputerClass";
 import { Boards } from "./interfaces";
 import {ComputerShotClass} from "./computerShotClass";
-import {from, Subject, merge,interval, fromEvent, combineLatest, concat, of} from "rxjs";
-import { mapTo,tap,scan,reduce,
-  mergeMap, take,
-  finalize,
-  repeat,
-  filter,
-  map,takeWhile, switchMap
+import {interval, fromEvent, concat, of} from "rxjs";
+import { tap,scan,
+  map,takeWhile
 } from "rxjs/operators";
 //let the ships also be another constant to be used
 import {gridSize, ships} from "./constants";
@@ -40,9 +36,8 @@ const playerSetup$ = (sci:ShipClassInterface) =>
 
 const computerSetup$ = (sci:ShipClassInterface) =>
   interval().pipe(
-    map((x:number)=> Math.floor(Math.random() * (gridSize*gridSize))+1 ),
+    map(_=> Math.floor(Math.random() * (gridSize*gridSize))+1 ),
     scan<number, ShipClassInterface>((acc:ShipClassInterface, curr:number)=> acc.add(curr),sci),
-    tap((x:ShipClassInterface)=>paintAll(x)),
     takeWhile((x:ShipClassInterface) => x.shipman.ships.length < ships)
   );
 

@@ -156,7 +156,7 @@ export class ComputerShotClass  extends ShotClass {
     else this._nextTry[shipLen].push({hitVal: x, possible:this.allDirection(x)});
   }
 
-  private inHorizontalLine(curr:number,n:number):boolean{
+  private inHorizontalLine(curr:number,n:number):boolean {
     if(curr%gridSize === 0) curr--;
     return Math.floor(curr/gridSize)*gridSize+1<= n &&  Math.floor(curr/gridSize)*gridSize+gridSize>=n;
   }

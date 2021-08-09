@@ -35,6 +35,15 @@ const cScore$ = cScore.pipe(tap((x:any)=>paintCScore(x)));
 function finishGame(p:BehaviorSubject<any>, c:BehaviorSubject<any>):boolean{
   return !(Object.values(p.value).filter((x:number)=> x !== 0).length === 0 || Object.values(c.value).filter((x:number)=> x !== 0).length === 0);
 }
+function whoWon(p:BehaviorSubject<any>, c:BehaviorSubject<any>):string{
+  if(Object.values(p.value).filter((x:number)=> x !== 0).length === 0){
+    return "player";
+  }else if(Object.values(c.value).filter((x:number)=> x !== 0).length === 0){
+    return "computer";
+  }
+  else return "nobody";
+}
+
 
 const turn$ = (initial:Boards)=>computerShot$(initial.computerShot).pipe(
   concatMap(_=>playerShot$(initial.playerShot))
@@ -58,5 +67,5 @@ const playerShot$ = (p:ShotClassInterface) => fromEvent(elem("shot-player"), "cl
 
 export const shots$ = (b:Boards)=> merge(turn$(b), pScore$, cScore$).pipe(
   takeWhile(_=> finishGame(cScore, pScore)),
-  finalize(()=>alert("GAME OVER"))
+  finalize(()=>alert(whoWon(pScore, cScore)))
 );
