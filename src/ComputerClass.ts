@@ -1,4 +1,5 @@
 import {ShipClass, ShipClassInterface, ShipMan, Direction} from "./shipclass";
+import { ships } from "./constants";
 
 export class ComputerClass extends ShipClass {
   _posTaken:number[];
@@ -12,17 +13,17 @@ export class ComputerClass extends ShipClass {
     let d:Direction;
     let len:number;
     if (this._shipman.ships.length !== 0) {
-      if (this._shipman.ships[this._shipman.ships.length-1].pos.length < 5 - this._shipman.ships.length+1){
-        len = 5 - this._shipman.ships.length + 1;
+      if (this._shipman.ships[this._shipman.ships.length-1].pos.length < ships - this._shipman.ships.length+1){
+        len = ships - this._shipman.ships.length + 1;
         d = this.checkValidity(x, len, this._shipman.ships[this._shipman.ships.length-1]);
       } else {
-        len = 5-this._shipman.ships.length;
+        len = ships-this._shipman.ships.length;
         d = this.checkValidity(x, len);
       }
 
     } else {
       d = Direction.all;
-      len = 5;
+      len = ships;
     }
     this.addMultiple(x, d, len);
     return this;

@@ -1,6 +1,7 @@
 import {paintCScore, paintPScore, elem, paintShot, paintCShot} from "./dom-updater";
 import { ShotClassInterface} from "./shotsClass";
 import { Boards } from "./interfaces";
+import {ships} from "./constants";
 
 import {merge, fromEvent,BehaviorSubject} from "rxjs";
 import {tap,
@@ -12,8 +13,19 @@ import {tap,
   takeWhile
 } from "rxjs/operators";
 
-const pScore = new BehaviorSubject<any>({1:1, 2:2, 3:3, 4:4, 5:5});
-const cScore = new BehaviorSubject<any>({1:1, 2:2, 3:3, 4:4, 5:5});
+
+//initialize the pScore and cSccore()
+
+function initScore():any{
+  let r:any = {};
+  for(let i =0; i<ships; i++){
+    r[i+1] = i+1;
+  }
+  return r;
+}
+
+const pScore = new BehaviorSubject<any>(initScore());
+const cScore = new BehaviorSubject<any>(initScore());
 
 const computerMove$ = new BehaviorSubject<number>(0);
 
@@ -29,14 +41,14 @@ const turn$ = (initial:Boards)=>computerShot$(initial.computerShot).pipe(
 );
 
 const computerShot$= (c:ShotClassInterface)=>computerMove$.pipe(
+  delay(200),//simulation of the comptuer taking time to think
   tap(_=>{
-    //when it is computer's turn do the following
     c.shoot(0, cScore);
     paintCShot(c.shots[c.shots.length-1].pos, c.shots[c.shots.length-1].hit);
   })
 );
 
-const playerShot$ = (p:ShotClassInterface) => fromEvent(elem("grid-container-player-id"), "click").pipe(
+const playerShot$ = (p:ShotClassInterface) => fromEvent(elem("shot-player"), "click").pipe(
   map((e:MouseEvent)=> parseInt((e.target as Element).id)),
   skipWhile((x:number)=>!p.shoot(x, pScore)),
   tap(_=>paintShot(p.shots[p.shots.length-1].pos, p.shots[p.shots.length-1].hit)),

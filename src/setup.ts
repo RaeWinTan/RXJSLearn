@@ -13,7 +13,8 @@ import { mapTo,tap,scan,reduce,
   filter,
   map,takeWhile, switchMap
 } from "rxjs/operators";
-import {gridSize} from "./constants";
+//let the ships also be another constant to be used
+import {gridSize, ships} from "./constants";
 const sc:ShipClassInterface = new ShipClass({ships:[], allPos:[]}, gridSize);
 const cc:ShipClassInterface = new ComputerClass({ships:[], allPos:[]}, gridSize);
 
@@ -27,13 +28,13 @@ export const ui$ = of({
   tap(_=> setUpGrid(gridSize))
 );
 const playerSetup$ = (sci:ShipClassInterface) =>
-  fromEvent(elem("grid-container-id"), "click").pipe(
+  fromEvent(elem("setup-player"), "click").pipe(
     map((e:MouseEvent)=> +(e.target as Element).id),
     scan<number, ShipClassInterface>((acc:ShipClassInterface, curr:number)=> acc.add(curr), sci),
     tap((x:ShipClassInterface)=>{
-      paintShip(x.shipman.ships[x.shipman.ships.length-1].pos[x.shipman.ships[x.shipman.ships.length-1].pos.length-1], 5-x.shipman.ships.length+1);
+      paintShip(x.shipman.ships[x.shipman.ships.length-1].pos[x.shipman.ships[x.shipman.ships.length-1].pos.length-1], ships-x.shipman.ships.length+1);
     }),
-    takeWhile((x:ShipClassInterface)=> x.shipman.ships.length < 5)
+    takeWhile((x:ShipClassInterface)=> x.shipman.ships.length < ships)
   );
 
 
@@ -42,7 +43,7 @@ const computerSetup$ = (sci:ShipClassInterface) =>
     map((x:number)=> Math.floor(Math.random() * (gridSize*gridSize))+1 ),
     scan<number, ShipClassInterface>((acc:ShipClassInterface, curr:number)=> acc.add(curr),sci),
     tap((x:ShipClassInterface)=>paintAll(x)),
-    takeWhile((x:ShipClassInterface) => x.shipman.ships.length < 5)
+    takeWhile((x:ShipClassInterface) => x.shipman.ships.length < ships)
   );
 
 export const setUp$ = (initial:Boards) => concat(

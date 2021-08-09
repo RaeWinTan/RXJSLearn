@@ -1,9 +1,13 @@
+
+import { ships } from "./constants";
 export const enum Direction{
   vertical="vertical",
   horizontal="horizontal",
   all="all",
   no="no"
 }
+
+
 
 
 interface Ship {
@@ -41,10 +45,10 @@ export class ShipClass implements ShipClassInterface {
       let pos:number[] = [];
       pos.push(curr);
       this._shipman.allPos.push(curr);
-      this._shipman.ships.push({pos:pos, length:5, posibleDirection:Direction.all});
+      this._shipman.ships.push({pos:pos, length:ships, posibleDirection:Direction.all});
     } else {
-      if(this._shipman.ships[this._shipman.ships.length-1].pos.length < 5 - this._shipman.ships.length+1){
-        let len:number = 5 - this._shipman.ships.length + 1;
+      if(this._shipman.ships[this._shipman.ships.length-1].pos.length < ships - this._shipman.ships.length+1){
+        let len:number = ships - this._shipman.ships.length + 1;
         let d:Direction = this.checkValidity(curr, len, this._shipman.ships[this._shipman.ships.length-1]);
         if(d!== Direction.no){
           this._shipman.allPos.push(curr);
@@ -54,7 +58,7 @@ export class ShipClass implements ShipClassInterface {
         }
       } else {
         //first time working on a new ship
-        let len = 5-this._shipman.ships.length;
+        let len = ships-this._shipman.ships.length;
         let d:Direction = this.checkValidity(curr, len);
         if (d !== Direction.no) {
           this._shipman.allPos.push(curr);

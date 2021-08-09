@@ -1,7 +1,7 @@
-import {ShotClass, ShotClassInterface} from "./shotsClass";
+import {ShotClass} from "./shotsClass";
 import { BehaviorSubject } from "rxjs";
 import {ShipClassInterface} from "./shipclass";
-import {gridSize, randomNum} from "./constants";
+import {gridSize, randomNum, ships} from "./constants";
 
 interface NextBest {
   hitVal:number;
@@ -13,18 +13,12 @@ interface NextTry {
 }
 
 export class ComputerShotClass  extends ShotClass {
-  _nextTry:NextTry;
+  _nextTry:NextTry = {};
   _shipProcessing:number[];
   _testRanShots:number[];
   constructor(oppShips:ShipClassInterface){
     super(oppShips);
-    this._nextTry = {
-      1:[],
-      2:[],
-      3:[],
-      4:[],
-       5:[]
-    };
+    for(let i = 0; i < ships; i++) this._nextTry[i+1] = [];
     this._shipProcessing = [];
   }
   shoot(x:number, scoreBoard:BehaviorSubject<any>):boolean{
@@ -46,7 +40,7 @@ export class ComputerShotClass  extends ShotClass {
           let nb:NextBest = this._nextTry[s][this._nextTry[s].length - 1]; //last element of the nextTry[s]
           for(let i =0; i< nb.possible.length; i++){
             if (super.shotBefore(nb.possible[i])) {
-              console.log("No need to shoot nextbest posiblity: ",nb.possible.shift());
+              nb.possible.shift();
               i--;//so dont process that posible val
             } else {//never shot before and in the nextBest[best case scenerio]
               super.shoot(nb.possible[i], scoreBoard);
@@ -54,7 +48,6 @@ export class ComputerShotClass  extends ShotClass {
                 if(this._shots[this._shots.length -1].shipLen === s){
                   this.updateNextTryMultiple(s, nb.possible[i]);
                 } else {//missed the nextTry boat but coinsidently hit another boat
-                  console.log("Coninsidently hiht another boat of len:", this._shots[this._shots.length -1].shipLen);
                   this.updateNextTry(this._shots[this._shots.length -1].shipLen,nb.possible.shift());
                 }
               } else {
