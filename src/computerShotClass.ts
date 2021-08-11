@@ -15,7 +15,6 @@ interface NextTry {
 export class ComputerShotClass  extends ShotClass {
   _nextTry:NextTry = {};
   _shipProcessing:number[];
-  _testRanShots:number[];
   constructor(oppShips:ShipClassInterface){
     super(oppShips);
     for(let i = 0; i < ships; i++) this._nextTry[i+1] = [];
