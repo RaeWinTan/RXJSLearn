@@ -2,14 +2,11 @@ import {ShipClass, ShipClassInterface, ShipMan, Direction} from "./shipclass";
 import { ships } from "./constants";
 
 export class ComputerClass extends ShipClass {
-  _posTaken:number[];
   constructor(shipman:ShipMan, gridSize:number){
     super(shipman, gridSize);
-    this._posTaken = [];
   }
 
   add(x:number):ShipClassInterface{
-    if(this._posTaken.includes(x)) return this;
     let d:Direction;
     let len:number;
     if (this._shipman.ships.length !== 0) {
