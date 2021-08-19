@@ -10,8 +10,8 @@
 yarn run start
 ```
 
-**Step 3: ** Change constants
-* got to src/constants.ts to change gridSize and ship
+**Step 3:** Change constants
+* go to src/constants.ts to change gridSize and ship
 
 # List of RXJS Projects
 * Flappy Bird: https://stackblitz.com/github/RaeWinTan/RXJSLearn/tree/flappybird
